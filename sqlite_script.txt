@@ -1,0 +1,154 @@
+CREATE TABLE IF NOT EXISTS `countries` (
+  `country_id` VARCHAR(2) NOT NULL,
+  `name` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`country_id`));
+
+
+-- -----------------------------------------------------
+-- Table `cities`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `cities` (
+  `city_id` INTEGER NOT NULL,
+  `name` VARCHAR(45) NOT NULL,
+  `country` VARCHAR(2) NOT NULL,
+  PRIMARY KEY (`city_id`),
+  CONSTRAINT `country`
+    FOREIGN KEY (`country`)
+    REFERENCES `countries` (`country_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+
+
+-- -----------------------------------------------------
+-- Table `airports`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `airports` (
+  `airport_id` INTEGER NOT NULL,
+  `airport_name` VARCHAR(3) NOT NULL,
+  `airport_city` INTEGER NOT NULL,
+  PRIMARY KEY (`airport_id` AUTOINCREMENT),
+  CONSTRAINT `airport_city`
+    FOREIGN KEY (`airport_city`)
+    REFERENCES `cities` (`city_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+
+
+-- -----------------------------------------------------
+-- Table `routes`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `routes` (
+  `route_id` INTEGER NOT NULL,
+  `departure_airport` INTEGER NOT NULL,
+  `destination_airport` INTEGER NOT NULL,
+  `ticket_price_rub` INTEGER NOT NULL,
+  `flight_time_min` INTEGER NOT NULL,
+  PRIMARY KEY (`route_id` AUTOINCREMENT),
+  CONSTRAINT `departure_airport`
+    FOREIGN KEY (`departure_airport`)
+    REFERENCES `airports` (`airport_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `destination_airport`
+    FOREIGN KEY (`destination_airport`)
+    REFERENCES `airports` (`airport_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+
+
+-- -----------------------------------------------------
+-- Table `plane_models`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `plane_models` (
+  `plane_model_id` INTEGER NOT NULL,
+  `model_name` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`plane_model_id` AUTOINCREMENT));
+
+
+-- -----------------------------------------------------
+-- Table `pilots`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `pilots` (
+  `pilot_id` INTEGER NOT NULL,
+  `name` VARCHAR(45) NOT NULL,
+  `address` VARCHAR(45) NULL,
+  `phone_number` VARCHAR(45) NULL,
+  `tenure_hours` INTEGER NOT NULL DEFAULT 0,
+  PRIMARY KEY (`pilot_id`));
+
+
+-- -----------------------------------------------------
+-- Table `planes`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `planes` (
+  `plane_id` INTEGER NOT NULL,
+  `plane_model` INTEGER NOT NULL,
+  `manufacture_date` DATE NOT NULL,
+  `service_life` INTEGER NOT NULL,
+  `ready` TINYINT NOT NULL DEFAULT 0,
+  `pilot` INTEGER NOT NULL,
+  PRIMARY KEY (`plane_id` AUTOINCREMENT),
+  CONSTRAINT `plane_model`
+    FOREIGN KEY (`plane_model`)
+    REFERENCES `plane_models` (`plane_model_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_planes_pilots1`
+    FOREIGN KEY (`pilot`)
+    REFERENCES `pilots` (`pilot_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+
+
+-- -----------------------------------------------------
+-- Table `flights`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `flights` (
+  `flight_id` INTEGER NOT NULL,
+  `route` INTEGER NOT NULL,
+  `departure_time` DATETIME NOT NULL,
+  `canceled` TINYINT NOT NULL DEFAULT 0,
+  `plane` INTEGER NOT NULL,
+  PRIMARY KEY (`flight_id` AUTOINCREMENT),
+  CONSTRAINT `route`
+    FOREIGN KEY (`route`)
+    REFERENCES `routes` (`route_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `plane`
+    FOREIGN KEY (`plane`)
+    REFERENCES `planes` (`plane_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+
+
+-- -----------------------------------------------------
+-- Table `passengers`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `passengers` (
+  `passport_id` INTEGER NOT NULL,
+  `name` VARCHAR(45) NOT NULL,
+  `address` VARCHAR(45) NULL,
+  `phone_number` VARCHAR(45) NULL,
+  PRIMARY KEY (`passport_id`));
+
+
+-- -----------------------------------------------------
+-- Table `passengers_has_flights`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `passengers_has_flights` (
+  `passengers_passport_id` INTEGER NOT NULL,
+  `flights_flight_id` INTEGER NOT NULL,
+  PRIMARY KEY (`passengers_passport_id`, `flights_flight_id`),
+  CONSTRAINT `fk_passengers_has_flights_passengers1`
+    FOREIGN KEY (`passengers_passport_id`)
+    REFERENCES `passengers` (`passport_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_passengers_has_flights_flights1`
+    FOREIGN KEY (`flights_flight_id`)
+    REFERENCES `flights` (`flight_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+
+
