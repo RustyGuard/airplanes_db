@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}get_people_on_plane{% endblock %}
+{% block content %}
+<h1>Люди на полете №{{flight_id}}</h1>
+<ul>
+    {% for item in people_on_plane %}
+    <li>{{item.name}}</li>
+    {% endfor %}
+</ul>
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}get_routes_info{% endblock %}
+{% block content %}
+<h1>Все маршруты</h1>
+<table border="1">
+    <thead>
+    <tr>
+        <td>departure_airport_name</td>
+        <td>destination_airport_name</td>
+        <td>flights_count</td>
+    </tr>
+    </thead>
+    {% for route in routes_info %}
+    <tr>
+        <td>{{route.departure_airport_name}}</td>
+        <td>{{route.destination_airport_name}}</td>
+        <td>{{route.flights_count}}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

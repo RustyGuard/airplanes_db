@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}get_passengers_with_info{% endblock %}
+{% block content %}
+<h1>Все пассажиры с информацией</h1>
+<table border="1">
+    <thead>
+    <tr>
+        <td>name</td>
+        <td>info</td>
+    </tr>
+    </thead>
+    {% for passenger in passengers_with_info %}
+    <tr>
+        <td>{{passenger.name}}</td>
+        <td>{{passenger.info}}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

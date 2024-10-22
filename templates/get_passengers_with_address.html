@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}get_passengers_with_address{% endblock %}
+{% block content %}
+<h1>Пассажиры с неуказанным адресом</h1>
+<table border="1">
+    <thead>
+    <tr>
+        <td>id</td>
+        <td>name</td>
+<!--        <td>address</td>-->
+<!--        <td>phone_number</td>-->
+    </tr>
+    </thead>
+    {% for passenger in passengers_with_address %}
+    <tr>
+        <td>{{passenger.id}}</td>
+        <td>{{passenger.name}}</td>
+<!--        <td>{{passenger.address}}</td>-->
+<!--        <td>{{passenger.phone_number}}</td>-->
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

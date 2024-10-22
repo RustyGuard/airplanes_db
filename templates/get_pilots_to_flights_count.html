@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}get_pilots_to_flights_count{% endblock %}
+{% block content %}
+<h1>Количество вылетов по пилотам</h1>
+<table border="1">
+    <thead>
+    <tr>
+        <td>name</td>
+        <td>flights_count</td>
+    </tr>
+    </thead>
+    {% for passenger in pilots_to_flights_count %}
+    <tr>
+        <td>{{passenger.name}}</td>
+        <td>{{passenger.flights_count}}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

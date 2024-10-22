@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}get_routes_within_duration_interval{% endblock %}
+{% block content %}
+<h1>Все маршруты с длительностью между {{min_duration}} и {{max_duration}} минутами</h1>
+<table border="1">
+    <thead>
+    <tr>
+        <td>departure_airport_name</td>
+        <td>destination_airport_name</td>
+        <td>flight_time_min</td>
+    </tr>
+    </thead>
+    {% for route in routes_within_duration_interval %}
+    <tr>
+        <td>{{route.departure_airport_name}}</td>
+        <td>{{route.destination_airport_name}}</td>
+        <td>{{route.flight_time_min}}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

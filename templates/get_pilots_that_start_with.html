@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}get_pilots_that_start_with{% endblock %}
+{% block content %}
+    <h1>Пилоты, фамилия которых начинается на {{starts_with}}</h1>
+    <ul>
+        {% for item in pilots_that_start_with %}
+            <li>{{item.name}}</li>
+        {% endfor %}
+    </ul>
+{% endblock %}

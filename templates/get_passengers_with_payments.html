@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}get_passengers_with_payments{% endblock %}
+{% block content %}
+<h1>История платежей по пассажирам</h1>
+{% for name, prices in passengers_with_payments.items() %}
+<ul>
+    <li>{{name}}</li>
+
+    <ol>
+    {% for price in prices %}
+        <li>{{price}}</li>
+    {% endfor %}
+    </ol>
+</ul>
+{% endfor %}
+{% endblock %}

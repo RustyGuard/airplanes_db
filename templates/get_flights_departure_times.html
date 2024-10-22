@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}get_flights_departure_times{% endblock %}
+{% block content %}
+    <h1>Различные времена вылета</h1>
+    <ul>
+        {% for item in flights_departure_times %}
+            <li>{{item.departure_time}}</li>
+        {% endfor %}
+    </ul>
+{% endblock %}

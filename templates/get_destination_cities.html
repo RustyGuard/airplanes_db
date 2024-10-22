@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}get_destination_cities{% endblock %}
+{% block content %}
+    <h1>Города прилёта</h1>
+    <ul>
+        {% for item in destination_cities %}
+            <li>{{item.name}}</li>
+        {% endfor %}
+    </ul>
+{% endblock %}
