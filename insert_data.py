@@ -98,18 +98,23 @@ for passenger_name in passengers:
         INSERT INTO passengers (name, address, phone_number) VALUES ('{passenger_name}', null, null)
     """)
 
-con.execute("""
-    INSERT INTO flights (route, departure_time, canceled, plane) VALUES (1,	'2024-10-02 10:00:00',	0,	2)
-""")
-flights = [
-    (1, 1),
-    (1, 2),
-    (1, 3),
-    (1, 4),
-]
-for route_id, passenger_id in flights:
-    con.execute(f"""
-        INSERT INTO passengers_has_flights VALUES ({route_id}, {passenger_id})
+FLIGHTS_COUNT = 30
+for i in range(FLIGHTS_COUNT):
+    con.execute("""
+        INSERT INTO flights (route, departure_time, canceled, plane) VALUES ((SELECT id FROM routes ORDER BY RANDOM() LIMIT 1), 
+        datetime(strftime('%s', '2024-10-01 00:00:00') +
+                abs(RANDOM() % (strftime('%s', '2024-10-31 23:59:59') -
+                                strftime('%s', '2024-10-01 00:00:00'))
+                   ),
+                'unixepoch'), 0, (SELECT id FROM planes ORDER BY RANDOM() LIMIT 1))
+    """)
+PASSENGERS_PER_FLIGHT = 5
+for i in range(FLIGHTS_COUNT * PASSENGERS_PER_FLIGHT):
+    con.execute("""
+        INSERT OR IGNORE INTO passengers_has_flights (passengers_passport_id, flights_flight_id) VALUES (
+            (SELECT id FROM passengers ORDER BY RANDOM() LIMIT 1),
+            (SELECT id FROM flights ORDER BY RANDOM() LIMIT 1)
+        )
     """)
 
 con.commit()
