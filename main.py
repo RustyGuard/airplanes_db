@@ -1,4 +1,6 @@
-from flask import Flask, render_template, abort, request
+from crypt import methods
+
+from flask import Flask, render_template, abort, request, redirect, url_for
 
 from app import app
 from database_connection import get_connection
@@ -27,6 +29,40 @@ def main_page():
 @app.route("/get_passengers_with_info")
 def get_passengers_with_info_page():
     return render_template("get_passengers_with_info.html", passengers_with_info=get_passengers_with_info())
+
+
+@app.route("/get_passengers_with_info/update", methods=["POST"])
+def set_passengers_with_info_page():
+    connection = get_connection()
+    connection.execute("""
+        UPDATE passengers 
+        SET name=?, address=?, phone_number=? 
+        WHERE id = ?;
+    """, (request.form["name"], request.form["address"] or None, request.form["phone_number"] or None, request.form["id"]))
+    connection.commit()
+    return redirect(url_for("get_passengers_with_info_page"))
+
+
+@app.route("/get_passengers_with_info/insert", methods=["POST"])
+def insert_passengers_with_info_page():
+    connection = get_connection()
+    connection.execute("""
+        INSERT INTO passengers (name, address, phone_number)
+        VALUES (?, ?, ?);
+    """, (request.form["name"], request.form["address"] or None, request.form["phone_number"] or None))
+    connection.commit()
+    return redirect(url_for("get_passengers_with_info_page"))
+
+
+@app.route("/get_passengers_with_info/delete")
+def delete_passengers_with_info_page():
+    connection = get_connection()
+    connection.execute("""
+        DELETE FROM passengers
+        WHERE id = ?;
+    """, (request.args["id"],))
+    connection.commit()
+    return redirect(url_for("get_passengers_with_info_page"))
 
 
 @app.route("/get_routes_info")

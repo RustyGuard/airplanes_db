@@ -7,9 +7,9 @@ from database_connection import get_connection
 # (алиаса) и сортировкой записей (ORDER BY).
 def get_passengers_with_info():
     return list(get_connection().execute("""
-        SELECT name, address + ", " + phone_number AS info 
+        SELECT id, name, address, phone_number 
         FROM passengers
-        ORDER BY info;
+        ORDER BY name;
     """))
 
 

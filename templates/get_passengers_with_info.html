@@ -2,18 +2,125 @@
 {% block title %}get_passengers_with_info{% endblock %}
 {% block content %}
 <h1>Все пассажиры с информацией</h1>
-<table border="1">
+<button class="btn btn-outline-primary m-2" data-bs-toggle="modal" data-bs-target="#exampleModalAdd">
+    Добавить
+</button>
+<table border="1" class="table table-striped">
     <thead>
     <tr>
-        <td>name</td>
-        <td>info</td>
+        <th>ФИО</th>
+        <th>Адрес</th>
+        <th>Номер телефона</th>
+        <th></th>
+        <th></th>
     </tr>
     </thead>
+    <tbody>
     {% for passenger in passengers_with_info %}
     <tr>
         <td>{{passenger.name}}</td>
-        <td>{{passenger.info}}</td>
+        <td>{{passenger.address or "Не указан"}}</td>
+        <td>{{passenger.phone_number or "Не указан"}}</td>
+        <td>
+            <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#exampleModal{{passenger.id}}">
+                Редактировать
+            </button>
+        </td>
+        <td>
+            <a class="btn btn-outline-danger" href="{{url_for('delete_passengers_with_info_page', id=passenger.id)}}">
+                Удалить
+            </a>
+        </td>
     </tr>
     {% endfor %}
+    </tbody>
 </table>
+
+{% for passenger in passengers_with_info %}
+<!-- Modal -->
+<div class="modal fade" id="exampleModal{{passenger.id}}" tabindex="-1" aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="{{url_for('set_passengers_with_info_page')}}" method="post">
+                <input hidden="hidden" value="{{passenger.id}}" name="id"/>
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Редактирование</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group row mt-3">
+                        <label for="name{{passenger.id}}" class="col-sm-2 col-form-label">ФИО</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="name{{passenger.id}}"
+                                   value="{{passenger.name}}" name="name">
+                        </div>
+                    </div>
+                    <div class="form-group row mt-3">
+                        <label for="address{{passenger.id}}" class="col-sm-2 col-form-label">Адрес</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="address{{passenger.id}}"
+                                   value="{{passenger.address}}" name="address">
+                        </div>
+                    </div>
+                    <div class="form-group row mt-3">
+                        <label for="phone_number{{passenger.id}}" class="col-sm-2 col-form-label">Номер телефона</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="phone_number{{passenger.id}}"
+                                   value="{{passenger.phone_number or ''}}" name="phone_number">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                    <button type="submit" class="btn btn-primary">Сохранить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModalAdd" tabindex="-1" aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="{{url_for('insert_passengers_with_info_page')}}" method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title">Добавление</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group row mt-3">
+                        <label for="nameAdd" class="col-sm-2 col-form-label">ФИО</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="nameAdd"
+                                   value="" name="name">
+                        </div>
+                    </div>
+                    <div class="form-group row mt-3">
+                        <label for="addressAdd" class="col-sm-2 col-form-label">Адрес</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="addressAdd"
+                                   value="" name="address">
+                        </div>
+                    </div>
+                    <div class="form-group row mt-3">
+                        <label for="phone_numberAdd" class="col-sm-2 col-form-label">Номер телефона</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="phone_numberAdd"
+                                   value="" name="phone_number">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                    <button type="submit" class="btn btn-primary">Добавить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
