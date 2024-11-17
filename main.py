@@ -1,6 +1,7 @@
 from flask import Flask, render_template, abort, request
 
 from app import app
+from database_connection import get_connection
 from queries import (
     get_passengers_with_info,
     get_routes_info,
@@ -11,7 +12,6 @@ from queries import (
     get_pilots_that_start_with,
     get_passengers_with_address,
     get_cities_to_airports_count,
-    get_tenure_hours_sum,
     get_ticket_price_average,
     get_passengers_with_payments,
     get_pilots_to_flights_count,
@@ -75,11 +75,6 @@ def get_cities_to_airports_count_page():
     return render_template("get_cities_to_airports_count.html", cities_to_airports_count=get_cities_to_airports_count())
 
 
-@app.route("/get_tenure_hours_sum")
-def get_tenure_hours_sum_page():
-    return render_template("get_tenure_hours_sum.html", tenure_hours_sum=get_tenure_hours_sum())
-
-
 @app.route("/get_ticket_price_average")
 def get_ticket_price_average_page():
     max_price = 30000
@@ -98,8 +93,12 @@ def get_pilots_to_flights_count_page():
 
 @app.route("/get_people_on_plane")
 def get_people_on_plane_page():
-    flight_id = 1
-    return render_template("get_people_on_plane.html", people_on_plane=get_people_on_plane(flight_id), flight_id=flight_id)
+    flight_id = request.args.get("flight_id", 1)
+    flights_ids = get_connection().execute("""SELECT id FROM flights""")
+    return render_template("get_people_on_plane.html",
+                           people_on_plane=get_people_on_plane(flight_id),
+                           flight_id=flight_id,
+                           flights_ids=flights_ids)
 
 
 app.run(debug=True)

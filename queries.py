@@ -1,5 +1,4 @@
 import itertools
-import sqlite3
 
 from database_connection import get_connection
 
@@ -86,22 +85,18 @@ def get_passengers_with_address():
 
 # 6.1
 def get_cities_to_airports_count():
-    # todo
     return list(get_connection().execute("""
-        SELECT COUNT(*) as count, (select name from cities where cities.id = airport_city) as name FROM airports
-        GROUP BY airport_city;
+        SELECT 
+        COUNT(*) as count, 
+        (select name from cities where cities.id = airport_city) as name,
+        airport_city
+        FROM airports
+        GROUP BY airport_city
+        ORDER BY count DESC;
     """))
 
 
 # 6.2
-def get_tenure_hours_sum():
-    return list(get_connection().execute("""
-        SELECT SUM(tenure_hours) as sum FROM pilots
-        GROUP BY tenure_hours;
-    """))[0]
-
-
-# 6.3
 def get_ticket_price_average(max_price: int):
     return list(get_connection().execute(f"""
         SELECT departure_airport, AVG(ticket_price_rub) as avg FROM routes
@@ -168,24 +163,3 @@ def get_people_on_plane(flight_id: int) -> list[str]:
             WHERE flights.id = {flight_id}
         """)
     )
-
-
-def main():
-    print(get_passengers_with_info())
-    print(get_routes_info())
-    print(get_flights_departure_times())
-    print(get_cheap_routes())
-    print(get_destination_cities())
-    print(get_routes_within_duration_interval())
-    print(get_pilots_that_start_with())
-    print(get_passengers_with_address())
-    print(get_cities_to_airports_count())
-    print(get_tenure_hours_sum())
-    print(get_ticket_price_average())
-    print(get_passengers_with_payments())
-    print(get_pilots_to_flights_count())
-    print(get_people_on_plane(1))
-
-
-if __name__ == '__main__':
-    main()

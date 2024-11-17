@@ -1,6 +1,14 @@
 {% extends "base.html" %}
 {% block title %}get_people_on_plane{% endblock %}
 {% block content %}
+<form action="/get_people_on_plane" method="get">
+    <select name="flight_id">
+        {% for item in flights_ids %}
+        <option value="{{item.id}}">{{item.id}}</option>
+        {% endfor %}
+    </select>
+    <button type="submit">Применить</button>
+</form>
 <h1>Люди на полете №{{flight_id}}</h1>
 <ul>
     {% for item in people_on_plane %}
