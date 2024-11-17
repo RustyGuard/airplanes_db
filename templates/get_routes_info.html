@@ -2,12 +2,12 @@
 {% block title %}get_routes_info{% endblock %}
 {% block content %}
 <h1>Все маршруты</h1>
-<table border="1">
+<table border="1" class="table table-striped">
     <thead>
     <tr>
-        <td>departure_airport_name</td>
-        <td>destination_airport_name</td>
-        <td>flights_count</td>
+        <th>departure_airport_name</th>
+        <th>destination_airport_name</th>
+        <th>flights_count</th>
     </tr>
     </thead>
     {% for route in routes_info %}

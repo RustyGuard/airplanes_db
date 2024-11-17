@@ -2,11 +2,11 @@
 {% block title %}get_ticket_price_average{% endblock %}
 {% block content %}
 <h1>Средняя цена по аэропортам, не выше {{max_price}}</h1>
-<table border="1">
+<table border="1" class="table table-striped">
     <thead>
     <tr>
-        <td>departure_airport</td>
-        <td>avg</td>
+        <th>departure_airport</th>
+        <th>avg</th>
     </tr>
     </thead>
     {% for passenger in ticket_price_average %}

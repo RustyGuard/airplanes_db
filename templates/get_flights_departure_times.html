@@ -2,9 +2,9 @@
 {% block title %}get_flights_departure_times{% endblock %}
 {% block content %}
     <h1>Различные времена вылета</h1>
-    <ul>
+    <ul class="list-group">
         {% for item in flights_departure_times %}
-            <li>{{item.departure_time}}</li>
+            <li class="list-group-item">{{item.departure_time}}</li>
         {% endfor %}
     </ul>
 {% endblock %}

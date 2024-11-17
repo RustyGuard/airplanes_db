@@ -2,11 +2,11 @@
 {% block title %}get_cities_to_airport_count{% endblock %}
 {% block content %}
 <h1>Количество аэропортов по городам</h1>
-<table border="1">
+<table border="1" class="table table-striped">
     <thead>
     <tr>
-        <td>name</td>
-        <td>count</td>
+        <th>name</th>
+        <th>count</th>
     </tr>
     </thead>
     {% for city in cities_to_airports_count %}

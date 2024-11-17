@@ -3,14 +3,15 @@
 {% block content %}
 <h1>История платежей по пассажирам</h1>
 {% for name, prices in passengers_with_payments.items() %}
-<ul>
-    <li>{{name}}</li>
-
-    <ol>
-    {% for price in prices %}
-        <li>{{price}}</li>
-    {% endfor %}
-    </ol>
+<ul class="list-group">
+    <li class="list-group-item">
+        {{name}}
+        <ol class="list-group list-group-numbered">
+            {% for price in prices %}
+            <li class="list-group-item">{{price}}</li>
+            {% endfor %}
+        </ol>
+    </li>
 </ul>
 {% endfor %}
 {% endblock %}

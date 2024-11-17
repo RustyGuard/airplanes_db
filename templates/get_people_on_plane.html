@@ -10,9 +10,9 @@
     <button type="submit">Применить</button>
 </form>
 <h1>Люди на полете №{{flight_id}}</h1>
-<ul>
+<ul class="list-group">
     {% for item in people_on_plane %}
-    <li>{{item.name}}</li>
+    <li class="list-group-item">{{item.name}}</li>
     {% endfor %}
 </ul>
 {% endblock %}

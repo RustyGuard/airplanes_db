@@ -2,9 +2,9 @@
 {% block title %}get_destination_cities{% endblock %}
 {% block content %}
     <h1>Города прилёта</h1>
-    <ul>
+    <ul class="list-group">
         {% for item in destination_cities %}
-            <li>{{item.name}}</li>
+            <li class="list-group-item">{{item.name}}</li>
         {% endfor %}
     </ul>
 {% endblock %}

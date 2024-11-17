@@ -2,9 +2,9 @@
 {% block title %}get_pilots_that_start_with{% endblock %}
 {% block content %}
     <h1>Пилоты, фамилия которых начинается на {{starts_with}}</h1>
-    <ul>
+    <ul class="list-group">
         {% for item in pilots_that_start_with %}
-            <li>{{item.name}}</li>
+            <li class="list-group-item">{{item.name}}</li>
         {% endfor %}
     </ul>
 {% endblock %}
