@@ -18,4 +18,68 @@
     </tr>
     {% endfor %}
 </table>
+
+<button class="btn btn-outline-primary m-2" data-bs-toggle="modal" data-bs-target="#newRoute">
+    Добавить
+</button>
+
+<div class="modal fade" id="newRoute" tabindex="-1" aria-labelledby="newRoute"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="{{url_for('add_routes_info_page')}}" method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Добавление</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group row mt-3">
+                        <label for="departure_airport" class="col col-form-label">Аэропорт вылета</label>
+                        <div class="col">
+                            <select id="departure_airport" name="departure_airport" class="form-control col">
+                                {% for item in airports %}
+                                <option value="{{item.id}}">
+                                    {{item.country_name}}, {{item.city_name}} - {{item.airport_name}}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row mt-3">
+                        <label for="destination_airport" class="col col-form-label">Аэропорт прилёта</label>
+                        <div class="col">
+                            <select id="destination_airport" name="destination_airport" class="form-control col">
+                                {% for item in airports %}
+                                <option value="{{item.id}}">
+                                    {{item.country_name}}, {{item.city_name}} - {{item.airport_name}}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row mt-3">
+                        <label for="flight_time_min" class="col col-form-label">Длительность полёта (в минутах)</label>
+
+                        <div class="col">
+                            <input min="1" value="1" type="number" class="form-control"
+                                   id="flight_time_min" name="flight_time_min">
+                        </div>
+                    </div>
+                    <div class="form-group row mt-3">
+                        <label for="ticket_price_rub" class="col col-form-label">Цена билета (в рублях)</label>
+
+                        <div class="col">
+                            <input min="1" value="1" type="number" class="form-control" id="ticket_price_rub" name="ticket_price_rub">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                    <button type="submit" class="btn btn-primary">Сохранить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 {% endblock %}

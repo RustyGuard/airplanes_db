@@ -1,18 +1,130 @@
 {% extends "base.html" %}
 {% block title %}get_people_on_plane{% endblock %}
 {% block content %}
-<form action="/get_people_on_plane" method="get">
-    <select name="flight_id">
+<form action="/get_people_on_plane" method="get" class="row column-gap-3">
+    <label for="flight_id" class="col">Номер полёта</label>
+    <select id="flight_id" name="flight_id" class="form-control col">
         {% for item in flights_ids %}
-        <option value="{{item.id}}">{{item.id}}</option>
+        <option value="{{item.id}}" {% if item.id|string== flight_id %}selected{% endif %}>{{item.id}}</option>
         {% endfor %}
     </select>
-    <button type="submit">Применить</button>
+    <button type="submit" class="btn btn-outline-primary col-3">Применить</button>
 </form>
+
+<button class="btn btn-outline-primary m-2" data-bs-toggle="modal" data-bs-target="#newFlight">
+    Новый рейс
+</button>
+
 <h1>Люди на полете №{{flight_id}}</h1>
-<ul class="list-group">
+<table border="1" class="table table-striped">
+    <thead>
+    <tr>
+        <th>ФИО</th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
     {% for item in people_on_plane %}
-    <li class="list-group-item">{{item.name}}</li>
+    <tr>
+        <td class="{% if item.type == 'pilot' %}fw-bold{% endif %}">{{item.name}}</td>
+        <td>
+            {% if item.type != 'pilot' %}
+            <a class="btn btn-outline-danger"
+               href="{{url_for('remove_people_on_plane_page', passenger_id=item.id, flight_id=flight_id)}}">
+                Удалить
+            </a>
+            {% endif %}
+        </td>
+    </tr>
     {% endfor %}
-</ul>
+    </tbody>
+</table>
+
+<button class="btn btn-outline-primary m-2" data-bs-toggle="modal" data-bs-target="#exampleModalAdd">
+    Добавить
+</button>
+
+<div class="modal fade" id="exampleModalAdd" tabindex="-1" aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="{{url_for('add_people_on_plane_page', flight_id=flight_id)}}" method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title">Добавление</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group row mt-3">
+                        <label for="passenger_id" class="col-sm-2 col-form-label">Пассажир</label>
+                        <div class="col-sm-10">
+                            <select id="passenger_id" name="passenger_id" class="form-control col">
+                                {% for item in passengers %}
+                                <option value="{{item.id}}">
+                                    {{item.name}}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                    <button type="submit" class="btn btn-primary">Добавить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="newFlight" tabindex="-1" aria-labelledby="newFlight"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="{{url_for('add_flight')}}" method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Добавление</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group row mt-3">
+                        <label for="route" class="col-sm-2 col-form-label">Маршрут</label>
+                        <div class="col-sm-10">
+                            <select id="route" name="route" class="form-control col">
+                                {% for item in routes %}
+                                <option value="{{item.id}}">
+                                    {{item.departure_airport_name}} - {{item.destination_airport_name}}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row mt-3">
+                        <label for="route" class="col-sm-2 col-form-label">Время вылета</label>
+
+                        <div class="col-sm-10">
+                            <input required type="datetime-local" class="form-control" id="departure_time" name="departure_time">
+                        </div>
+                    </div>
+                    <div class="form-group row mt-3">
+                        <label for="plane" class="col-sm-2 col-form-label">Самолёт</label>
+                        <div class="col-sm-10">
+                            <select id="plane" name="plane" class="form-control col">
+                                {% for item in planes %}
+                                <option value="{{item.id}}">
+                                    {{item.model_name}}, пилот - {{item.pilot_name}}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                    <button type="submit" class="btn btn-primary">Сохранить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock %}

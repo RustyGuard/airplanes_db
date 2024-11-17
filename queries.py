@@ -16,12 +16,15 @@ def get_passengers_with_info():
 # Запрос с использованием сортировки (ORDER BY) и группировки (GROUP BY).
 def get_routes_info():
     return list(get_connection().execute("""
-        SELECT departure.airport_name as departure_airport_name, destination.airport_name as destination_airport_name, COUNT(flights.id) as flights_count FROM routes
-        JOIN flights ON flights.route = routes.id
+        SELECT 
+        departure.airport_name as departure_airport_name, 
+        destination.airport_name as destination_airport_name, 
+        COUNT(flights.id) as flights_count FROM routes
+        LEFT JOIN flights ON flights.route = routes.id
         JOIN airports departure ON departure_airport = departure.id
         JOIN airports destination ON destination_airport = destination.id
-        GROUP BY flights.id
-        ORDER BY departure.airport_name
+        GROUP BY routes.id
+        ORDER BY departure.airport_name;
     """))
 
 
@@ -153,13 +156,14 @@ def get_people_on_plane(flight_id: int) -> list[str]:
     """
     return list(
         get_connection().execute(f"""
-            SELECT name FROM passengers_has_flights 
+            SELECT passengers.id as id, name, 'passenger' as type FROM passengers_has_flights 
             JOIN passengers ON passengers.id = passengers_has_flights.passengers_passport_id
             WHERE passengers_has_flights.flights_flight_id = {flight_id}
             UNION
-            SELECT name FROM flights
+            SELECT pilots.id as id, name, 'pilot' as type FROM flights
             JOIN planes ON flights.plane = planes.id
             JOIN pilots ON planes.pilot = pilots.id
             WHERE flights.id = {flight_id}
+            ORDER BY name
         """)
     )
