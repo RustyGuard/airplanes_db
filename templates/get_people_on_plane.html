@@ -16,6 +16,13 @@
 </button>
 
 <h1>Люди на полете №{{flight_id}}</h1>
+<h2>Время вылета: {{flight_info["departure_time"]}}</h2>
+{% if flight_info.canceled %}
+<h3 style="color: red;">Отменён</h3>
+{% else %}
+<h3 style="color: green;">Активен</h3>
+<a class="btn btn-outline-danger m-1" href="{{url_for('cancel_flight', flight_id=flight_id)}}">Отменить</a>
+{% endif %}
 <table border="1" class="table table-striped">
     <thead>
     <tr>
@@ -28,7 +35,7 @@
     <tr>
         <td class="{% if item.type == 'pilot' %}fw-bold{% endif %}">{{item.name}}</td>
         <td>
-            {% if item.type != 'pilot' %}
+            {% if item.type != 'pilot' and not flight_info.canceled %}
             <a class="btn btn-outline-danger"
                href="{{url_for('remove_people_on_plane_page', passenger_id=item.id, flight_id=flight_id)}}">
                 Удалить
@@ -40,9 +47,11 @@
     </tbody>
 </table>
 
+{% if not flight_info.canceled %}
 <button class="btn btn-outline-primary m-2" data-bs-toggle="modal" data-bs-target="#exampleModalAdd">
     Добавить
 </button>
+{% endif %}
 
 <div class="modal fade" id="exampleModalAdd" tabindex="-1" aria-labelledby="exampleModalLabel"
      aria-hidden="true">

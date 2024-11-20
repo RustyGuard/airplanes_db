@@ -187,13 +187,19 @@ def get_people_on_plane_page():
         JOIN airports departure ON departure_airport = departure.id
         JOIN airports destination ON destination_airport = destination.id
     """))
+    flight_info = list(get_connection().execute("""
+        SELECT * FROM flights WHERE id = ?
+    """, (flight_id,)))[0]
+    print(flight_info)
     return render_template("get_people_on_plane.html",
                            people_on_plane=get_people_on_plane(flight_id),
                            flight_id=flight_id,
                            flights_ids=flights_ids,
                            passengers=passengers,
                            planes=planes,
-                           routes=routes)
+                           routes=routes,
+                           flight_info=flight_info,
+                           )
 
 
 @app.route("/get_people_on_plane/insert", methods=["POST"])
@@ -204,6 +210,19 @@ def add_people_on_plane_page():
         INSERT INTO passengers_has_flights (passengers_passport_id, flights_flight_id)
         VALUES (?, ?) 
     """, (request.form["passenger_id"], flight_id))
+    connection.commit()
+    return redirect(url_for("get_people_on_plane_page", flight_id=request.args["flight_id"]))
+
+
+@app.route("/get_people_on_plane/cancel", methods=["GET"])
+def cancel_flight():
+    flight_id = request.args.get("flight_id", 1)
+    connection = get_connection()
+    connection.execute(f"""
+        UPDATE flights
+        SET canceled = 1
+        WHERE id = ?
+    """, (flight_id,))
     connection.commit()
     return redirect(url_for("get_people_on_plane_page", flight_id=request.args["flight_id"]))
 
