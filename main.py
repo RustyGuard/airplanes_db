@@ -1,6 +1,4 @@
-import datetime
-
-import dateutil
+from dateutil.parser import parse
 from flask import render_template, request, redirect, url_for
 
 from app import app
@@ -20,7 +18,7 @@ from queries import (
     get_pilots_to_flights_count,
     get_people_on_plane,
 )
-from dateutil.parser import parse
+
 
 @app.route("/")
 def main_page():
@@ -39,7 +37,8 @@ def set_passengers_with_info_page():
         UPDATE passengers 
         SET name=?, address=?, phone_number=? 
         WHERE id = ?;
-    """, (request.form["name"], request.form["address"] or None, request.form["phone_number"] or None, request.form["id"]))
+    """, (
+    request.form["name"], request.form["address"] or None, request.form["phone_number"] or None, request.form["id"]))
     connection.commit()
     return redirect(url_for("get_passengers_with_info_page"))
 
@@ -126,14 +125,16 @@ def get_routes_within_duration_interval_page():
     max_duration = 60
     min_duration = 30
     return render_template("get_routes_within_duration_interval.html",
-                           routes_within_duration_interval=get_routes_within_duration_interval(min_duration=min_duration, max_duration=max_duration),
+                           routes_within_duration_interval=get_routes_within_duration_interval(
+                               min_duration=min_duration, max_duration=max_duration),
                            min_duration=min_duration, max_duration=max_duration)
 
 
 @app.route("/get_pilots_that_start_with")
 def get_pilots_that_start_with_page():
     starts_with = "А"
-    return render_template("get_pilots_that_start_with.html", pilots_that_start_with=get_pilots_that_start_with(starts_with), starts_with=starts_with)
+    return render_template("get_pilots_that_start_with.html",
+                           pilots_that_start_with=get_pilots_that_start_with(starts_with), starts_with=starts_with)
 
 
 @app.route("/get_passengers_with_address")
@@ -149,7 +150,8 @@ def get_cities_to_airports_count_page():
 @app.route("/get_ticket_price_average")
 def get_ticket_price_average_page():
     max_price = 30000
-    return render_template("get_ticket_price_average.html", ticket_price_average=get_ticket_price_average(max_price), max_price=max_price)
+    return render_template("get_ticket_price_average.html", ticket_price_average=get_ticket_price_average(max_price),
+                           max_price=max_price)
 
 
 @app.route("/get_passengers_with_payments")
@@ -238,6 +240,7 @@ def remove_people_on_plane_page():
     connection.commit()
     return redirect(url_for("get_people_on_plane_page", flight_id=request.args["flight_id"]))
 
+
 @app.route("/get_people_on_plane/add_flight", methods=["POST"])
 def add_flight():
     print(request.form)
@@ -254,4 +257,9 @@ def add_flight():
     return redirect(url_for("get_people_on_plane_page", flight_id=result["id"]))
 
 
-app.run(debug=True)
+def main():
+    app.run(debug=True)
+
+
+if __name__ == '__main__':
+    main()
