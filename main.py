@@ -1,5 +1,8 @@
+import logging
+
+import structlog
 from dateutil.parser import parse
-from flask import render_template, request, redirect, url_for
+from flask import render_template, request, redirect, url_for, Response
 
 from app import app
 from database_connection import get_connection
@@ -19,6 +22,8 @@ from queries import (
     get_people_on_plane,
 )
 
+logger: structlog.stdlib.BoundLogger = structlog.get_logger()
+
 
 @app.route("/")
 def main_page():
@@ -33,35 +38,42 @@ def get_passengers_with_info_page():
 @app.route("/get_passengers_with_info/update", methods=["POST"])
 def set_passengers_with_info_page():
     connection = get_connection()
+    passenger_id = request.form["id"]
     connection.execute("""
         UPDATE passengers 
         SET name=?, address=?, phone_number=? 
         WHERE id = ?;
     """, (
-    request.form["name"], request.form["address"] or None, request.form["phone_number"] or None, request.form["id"]))
+        request.form["name"], request.form["address"] or None, request.form["phone_number"] or None, passenger_id))
     connection.commit()
+    logger.info("Passenger info updated", passenger_id=passenger_id)
     return redirect(url_for("get_passengers_with_info_page"))
 
 
 @app.route("/get_passengers_with_info/insert", methods=["POST"])
 def insert_passengers_with_info_page():
     connection = get_connection()
-    connection.execute("""
+    result = next(connection.execute("""
         INSERT INTO passengers (name, address, phone_number)
-        VALUES (?, ?, ?);
-    """, (request.form["name"], request.form["address"] or None, request.form["phone_number"] or None))
+        VALUES (?, ?, ?)
+        RETURNING id;
+    """, (request.form["name"], request.form["address"] or None, request.form["phone_number"] or None)))
+    passenger_id = result["id"]
     connection.commit()
+    logger.info("New passenger info added", passenger_id=passenger_id)
     return redirect(url_for("get_passengers_with_info_page"))
 
 
 @app.route("/get_passengers_with_info/delete")
 def delete_passengers_with_info_page():
     connection = get_connection()
+    passenger_id = request.args["id"]
     connection.execute("""
         DELETE FROM passengers
         WHERE id = ?;
-    """, (request.args["id"],))
+    """, (passenger_id,))
     connection.commit()
+    logger.info("Passenger info deleted", passenger_id=passenger_id)
     return redirect(url_for("get_passengers_with_info_page"))
 
 
@@ -86,21 +98,24 @@ def get_routes_info_page():
 @app.route("/get_routes_info/add", methods=["POST"])
 def add_routes_info_page():
     connection = get_connection()
-    connection.execute("""
+    result = next(connection.execute("""
         INSERT INTO routes (
         departure_airport,
         destination_airport,
         ticket_price_rub,
         flight_time_min
         )
-        VALUES (?, ?, ?, ?);
+        VALUES (?, ?, ?, ?)
+        RETURNING id;
     """, (
         request.form["departure_airport"],
         request.form["destination_airport"],
         request.form["ticket_price_rub"],
         request.form["flight_time_min"],
-    ))
+    )))
+    route_id = result["id"]
     connection.commit()
+    logger.info("New route added", route_id=route_id)
     return redirect(url_for("get_routes_info_page"))
 
 
@@ -192,7 +207,6 @@ def get_people_on_plane_page():
     flight_info = list(get_connection().execute("""
         SELECT * FROM flights WHERE id = ?
     """, (flight_id,)))[0]
-    print(flight_info)
     return render_template("get_people_on_plane.html",
                            people_on_plane=get_people_on_plane(flight_id),
                            flight_id=flight_id,
@@ -208,11 +222,13 @@ def get_people_on_plane_page():
 def add_people_on_plane_page():
     flight_id = request.args.get("flight_id", 1)
     connection = get_connection()
+    passenger_id = request.form["passenger_id"]
     connection.execute(f"""
         INSERT INTO passengers_has_flights (passengers_passport_id, flights_flight_id)
         VALUES (?, ?) 
-    """, (request.form["passenger_id"], flight_id))
+    """, (passenger_id, flight_id))
     connection.commit()
+    logger.info("Passenger added to a flight", passenger_id=passenger_id, flight_id=flight_id)
     return redirect(url_for("get_people_on_plane_page", flight_id=request.args["flight_id"]))
 
 
@@ -226,26 +242,27 @@ def cancel_flight():
         WHERE id = ?
     """, (flight_id,))
     connection.commit()
+    logger.info("Flight cancelled", flight_id=flight_id)
     return redirect(url_for("get_people_on_plane_page", flight_id=request.args["flight_id"]))
 
 
 @app.route("/get_people_on_plane/delete", methods=["GET"])
 def remove_people_on_plane_page():
     connection = get_connection()
+    passenger_id = request.args["passenger_id"]
+    flight_id = request.args["flight_id"]
     connection.execute(f"""
         DELETE FROM passengers_has_flights 
         WHERE passengers_passport_id=? and flights_flight_id=?
-    """, (request.args["passenger_id"], request.args["flight_id"]))
-    print(request.args)
+    """, (passenger_id, flight_id))
     connection.commit()
-    return redirect(url_for("get_people_on_plane_page", flight_id=request.args["flight_id"]))
+    logger.info("Passenger removed from a flight", passenger_id=passenger_id, flight_id=flight_id)
+    return redirect(url_for("get_people_on_plane_page", flight_id=flight_id))
 
 
 @app.route("/get_people_on_plane/add_flight", methods=["POST"])
 def add_flight():
-    print(request.form)
     departure_time = parse(request.form["departure_time"])
-    print(departure_time)
     connection = get_connection()
     result = next(connection.execute(f"""
         INSERT INTO flights 
@@ -253,12 +270,35 @@ def add_flight():
         VALUES (?, ?, ?)
         RETURNING id
     """, (request.form["route"], departure_time, request.form["plane"])))
+    flight_id = result["id"]
     connection.commit()
-    return redirect(url_for("get_people_on_plane_page", flight_id=result["id"]))
+    logger.info("New flight added", flight_id=flight_id)
+    return redirect(url_for("get_people_on_plane_page", flight_id=flight_id))
+
+
+@app.after_request
+def log_response(resp: Response) -> Response:
+    route_name = request.url_rule.endpoint if request.url_rule is not None else None
+    if resp.status_code >= 300:
+        logger.error(
+            f"Failed request", method=request.method, url_path=request.base_url, route_name=route_name,
+            status_code=resp.status_code
+        )
+    else:
+        logger.debug(
+            f"Successful request", method=request.method, url_path=request.base_url, route_name=route_name,
+            status_code=resp.status_code
+        )
+    return resp
 
 
 def main():
-    app.run(debug=True)
+    log = logging.getLogger('werkzeug')
+    log.setLevel(logging.ERROR)
+    host = "127.0.0.1"
+    port = 5000
+    logger.info("Starting a server", url=f"http://{host}:{port}")
+    app.run(debug=True, host=host, port=port)
 
 
 if __name__ == '__main__':
