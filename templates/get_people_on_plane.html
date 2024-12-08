@@ -15,6 +15,7 @@
     Новый рейс
 </button>
 
+{% if flight_info != None %}
 <h1>Люди на полете №{{flight_id}}</h1>
 <h2>Время вылета: {{flight_info["departure_time"]}}</h2>
 {% if flight_info.canceled %}
@@ -84,6 +85,8 @@
         </div>
     </div>
 </div>
+
+{% endif %}
 
 <!-- Modal -->
 <div class="modal fade" id="newFlight" tabindex="-1" aria-labelledby="newFlight"

@@ -204,9 +204,12 @@ def get_people_on_plane_page():
         JOIN airports departure ON departure_airport = departure.id
         JOIN airports destination ON destination_airport = destination.id
     """))
-    flight_info = list(get_connection().execute("""
-        SELECT * FROM flights WHERE id = ?
-    """, (flight_id,)))[0]
+    try:
+        flight_info = list(get_connection().execute("""
+            SELECT * FROM flights WHERE id = ?
+        """, (flight_id,)))[0]
+    except IndexError:
+        flight_info = None
     return render_template("get_people_on_plane.html",
                            people_on_plane=get_people_on_plane(flight_id),
                            flight_id=flight_id,
