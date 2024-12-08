@@ -19,5 +19,8 @@ statistics_pages = [
     statistics_pages,
 )
 def test_get_statistics_page(test_client, page_url: str):
+    """
+    Проверить что страницы со статистикой отображаются даже с пустой бд
+    """
     response = test_client.get(page_url)
     assert response.status_code == 200

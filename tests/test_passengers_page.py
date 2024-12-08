@@ -2,6 +2,9 @@ from bs4 import BeautifulSoup
 
 
 def test_get_passengers(test_client):
+    """
+    Проверить что страница отображения пассажиров отображается даже без созданных пассажиров
+    """
     response = test_client.get("/get_passengers_with_info")
     assert response.status_code == 200
     html_content = response.data.decode("utf-8")
@@ -9,6 +12,10 @@ def test_get_passengers(test_client):
 
 
 def test_create_passenger(test_client):
+    """
+    Проверить что создание пассажира выполняется.
+    Проверить что созданный пассажир появляется на страничке
+    """
     response = test_client.post("/get_passengers_with_info/insert", data={
         "name": "test_name",
         "address": "test_address",
@@ -26,6 +33,9 @@ def test_create_passenger(test_client):
 
 
 def get_first_passenger_id(test_client) -> str:
+    """
+    Вернуть первый попавшийся на странице passenger_id
+    """
     get_response = test_client.get("/get_passengers_with_info")
     assert get_response.status_code == 200
     html_content = get_response.data.decode("utf-8")
@@ -35,6 +45,9 @@ def get_first_passenger_id(test_client) -> str:
 
 
 def get_passengers_in_table(test_client) -> list[list[str]]:
+    """
+    Вернуть пассажиров, отображаемых в таблице
+    """
     get_response = test_client.get("/get_passengers_with_info")
     assert get_response.status_code == 200
     html_content = get_response.data.decode("utf-8")
@@ -47,6 +60,9 @@ def get_passengers_in_table(test_client) -> list[list[str]]:
 
 
 def test_update_passenger(test_client):
+    """
+    Проверить что обновление пассажиров выполняется и изменяет данные в таблице
+    """
     insert_response = test_client.post("/get_passengers_with_info/insert", data={
         "name": "test_name",
         "address": "test_address",
@@ -72,6 +88,9 @@ def test_update_passenger(test_client):
 
 
 def test_delete_passenger(test_client):
+    """
+    Проверить что удаление пассажира удаляет запись в таблице
+    """
     insert_response = test_client.post("/get_passengers_with_info/insert", data={
         "name": "test_name",
         "address": "test_address",
