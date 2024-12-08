@@ -1,9 +1,12 @@
 import sqlite3
-from pathlib import Path
 
-Path("airplanes.db").unlink(missing_ok=True)
 
-con = sqlite3.connect("airplanes.db")
-with open("sqlite_script.txt", mode="r", encoding="utf8") as tables_statements:
-    con.executescript(tables_statements.read())
-con.commit()
+def create_tables(connection):
+    with open("sqlite_script.txt", mode="r", encoding="utf8") as tables_statements:
+        connection.executescript(tables_statements.read())
+    connection.commit()
+
+
+if __name__ == '__main__':
+    connection = sqlite3.connect("airplanes.db")
+    create_tables(connection)

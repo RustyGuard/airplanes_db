@@ -3,15 +3,17 @@ from sqlite3 import Error
 from flask import g
 
 from app import app
+from create_tables import create_tables
 
 DATABASE_PATH = "airplanes.db"
 
 
 def create_tables_if_not_exist(connection):
     try:
-        c = connection.cursor()
+        create_tables(connection)
     except Error as e:
         print(e)
+        raise
 
 
 def dict_factory(cursor, row):
