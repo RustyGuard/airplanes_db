@@ -2,12 +2,17 @@
 {% block title %}get_routes_info{% endblock %}
 {% block content %}
 <h1>Все маршруты</h1>
+
+<button class="btn btn-outline-primary m-2" data-bs-toggle="modal" data-bs-target="#exampleModalAdd">
+    Выгрузить отчёт
+</button>
+
 <table border="1" class="table table-striped">
     <thead>
     <tr>
-        <th>departure_airport_name</th>
-        <th>destination_airport_name</th>
-        <th>flights_count</th>
+        <th>Аэропорт вылета</th>
+        <th>Аэропорт прибытия</th>
+        <th>Общее число рейсов</th>
     </tr>
     </thead>
     {% for route in routes_info %}
@@ -69,13 +74,36 @@
                         <label for="ticket_price_rub" class="col col-form-label">Цена билета (в рублях)</label>
 
                         <div class="col">
-                            <input min="1" value="1" type="number" class="form-control" id="ticket_price_rub" name="ticket_price_rub">
+                            <input min="1" value="1" type="number" class="form-control" id="ticket_price_rub"
+                                   name="ticket_price_rub">
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
                     <button type="submit" class="btn btn-primary">Сохранить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="exampleModalAdd" tabindex="-1" aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="{{url_for('add_people_on_plane_page', flight_id=flight_id)}}" method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title">Загрузка отчётов</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    {% for i in years %}
+                    <a href="{{url_for('download_routes_income_table', year=i['year'])}}"
+                       class="btn btn-outline-primary m-2"
+                       download>
+                        Отчёт за {{i["year"]}} год
+                    </a>
+                    {% endfor %}
                 </div>
             </form>
         </div>

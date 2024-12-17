@@ -1,11 +1,13 @@
 import logging
+import tempfile
 
 import structlog
 from dateutil.parser import parse
-from flask import render_template, request, redirect, url_for, Response
+from flask import render_template, request, redirect, url_for, Response, send_file
 
 from app import app
 from database_connection import get_connection
+from export_report import export_routes_report
 from queries import (
     get_passengers_with_info,
     get_routes_info,
@@ -90,9 +92,12 @@ def get_routes_info_page():
         JOIN countries ON cities.country = countries.id 
         ORDER BY country_name, city_name, airport_name
     """))
+    years = list(get_connection().execute("""
+        SELECT DISTINCT substr(departure_time, 1, 4) as year FROM flights ORDER BY year 
+    """))
 
     return render_template("get_routes_info.html", routes_info=get_routes_info(),
-                           airports=airports)
+                           airports=airports, years=years)
 
 
 @app.route("/get_routes_info/add", methods=["POST"])
@@ -277,6 +282,14 @@ def add_flight():
     connection.commit()
     logger.info("New flight added", flight_id=flight_id)
     return redirect(url_for("get_people_on_plane_page", flight_id=flight_id))
+
+
+@app.route("/routes/download_income")
+def download_routes_income_table():
+    year = int(request.args["year"])
+    with tempfile.NamedTemporaryFile(suffix=".xlsx") as temporary_file:
+        export_routes_report(temporary_file.name, year)
+        return send_file(temporary_file.name, download_name=f"Отчёт по маршрутам за {year} год.xlsx", as_attachment=True)
 
 
 @app.after_request
